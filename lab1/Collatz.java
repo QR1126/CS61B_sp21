@@ -3,7 +3,9 @@
  */
 public class Collatz {
 
-    /** Buggy implementation of nextNumber! */
+    /** If n is even, the next number is n/2.
+     * If n is odd, the next number is 3n + 1.
+     * If n is 1, the sequence is over. */
     public static int nextNumber(int n) {
         if ((n & 1) == 1) {
             return 3 * n + 1;
