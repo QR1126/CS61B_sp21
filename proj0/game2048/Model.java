@@ -1,6 +1,7 @@
 package game2048;
 
 import java.util.Formatter;
+import java.util.Iterator;
 import java.util.Observable;
 
 
@@ -139,12 +140,11 @@ public class Model extends Observable {
      *  Empty spaces are stored as null.
      * */
     public static boolean emptySpaceExists(Board b) {
-        int size = b.size();
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (b.tile(i, j) == null) {
-                    return true;
-                }
+        Iterator<Tile> iterator = b.iterator();
+        while (iterator.hasNext()) {
+            Tile tile = iterator.next();
+            if (tile == null) {
+                return true;
             }
         }
         return false;
@@ -156,12 +156,11 @@ public class Model extends Observable {
      * given a Tile object t, we get its value with t.value().
      */
     public static boolean maxTileExists(Board b) {
-        int size = b.size();
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (b.tile(i, j) != null && b.tile(i, j).value() == MAX_PIECE) {
-                    return true;
-                }
+        Iterator<Tile> iterator = b.iterator();
+        while (iterator.hasNext()) {
+            Tile tile = iterator.next();
+            if (tile != null && tile.value() == MAX_PIECE) {
+                return true;
             }
         }
         return false;
