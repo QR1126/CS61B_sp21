@@ -1,5 +1,6 @@
 package game2048;
 
+import java.sql.Timestamp;
 import java.util.Formatter;
 import java.util.Iterator;
 import java.util.Observable;
@@ -113,9 +114,14 @@ public class Model extends Observable {
         boolean changed;
         changed = false;
 
-        // TODO: Modify this.board (and perhaps this.score) to account
-        // for the tilt to the Side SIDE. If the board changed, set the
-        // changed local variable to true.
+        board.setViewingPerspective(side);
+        int size = board.size();
+        for (int c = 0; c < size; c++) {
+            if (tiltOneCol(c)) {
+                changed = true;
+            }
+        }
+        board.setViewingPerspective(Side.NORTH);
 
         checkGameOver();
         if (changed) {
@@ -123,6 +129,35 @@ public class Model extends Observable {
         }
         return changed;
     }
+
+    /** Figure out which row each tile should end up on.*/
+    private boolean tiltOneCol(int col) {
+       boolean res = false;
+       int size = board.size();
+       boolean[] mergerd = new boolean[size];
+       for (int row = size - 1; row >= 0; row--) {
+           if (row == size - 1) continue;
+           if (board.tile(col, row) == null) continue;
+           Tile tile = board.tile(col, row);
+           int value = tile.value();
+           for (int cr = size - 1; cr > row; cr--) {
+               Tile target = board.tile(col, cr);
+               if (!mergerd[cr] && target != null && target.value() == tile.value()) {
+                   board.move(col, cr, tile);
+                   score += value * 2;
+                   mergerd[cr] = true;
+                   res = true;
+                   break;
+               } else if (target == null) {
+                   board.move(col, cr, tile);
+                   res = true;
+                   break;
+               }
+           }
+       }
+       return res;
+    }
+
 
     /** Checks if the game is over and sets the gameOver variable
      *  appropriately.
@@ -174,11 +209,11 @@ public class Model extends Observable {
      */
     public static boolean atLeastOneMoveExists(Board b) {
         int size = b.size();
+        if (emptySpaceExists(b)) {
+            return true;
+        }
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (b.tile(i, j) == null) {
-                    return true;
-                }
                 for (int k = 0; k < 4; k++) {
                     int xx = i + dx[k], yy = j + dy[k];
                     if (xx >= 0 && xx < size && yy >= 0 && yy < size
