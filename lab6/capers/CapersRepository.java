@@ -1,10 +1,13 @@
 package capers;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.Date;
+
 import static capers.Utils.*;
 
 /** A repository for Capers 
- * @author TODO
+ * @author QR1126
  * The structure of a Capers Repository is as follows:
  *
  * .capers/ -- top level folder for all persistent data in your lab12 folder
@@ -18,9 +21,10 @@ public class CapersRepository {
     static final File CWD = new File(System.getProperty("user.dir"));
 
     /** Main metadata folder. */
-    static final File CAPERS_FOLDER = null; // TODO Hint: look at the `join`
+    static final File CAPERS_FOLDER = Utils.join(CWD, ".capers"); // TODO Hint: look at the `join`
                                             //      function in Utils
 
+    static File story = Utils.join(CAPERS_FOLDER, "story");
     /**
      * Does required filesystem operations to allow for persistence.
      * (creates any necessary folders or files)
@@ -32,6 +36,13 @@ public class CapersRepository {
      */
     public static void setupPersistence() {
         // TODO
+        CAPERS_FOLDER.mkdirs();
+        Dog.DOG_FOLDER.mkdirs();
+        try {
+            story.createNewFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -41,6 +52,10 @@ public class CapersRepository {
      */
     public static void writeStory(String text) {
         // TODO
+        if (text != null) {
+            Utils.writeContents(story, Utils.readContents(story), text, "\n");
+        }
+        System.out.println(Utils.readContentsAsString(story));
     }
 
     /**
@@ -50,6 +65,9 @@ public class CapersRepository {
      */
     public static void makeDog(String name, String breed, int age) {
         // TODO
+        Dog dog =new Dog(name,breed,age);
+        dog.saveDog();
+        System.out.println(dog);
     }
 
     /**
@@ -60,5 +78,10 @@ public class CapersRepository {
      */
     public static void celebrateBirthday(String name) {
         // TODO
+        Dog dog=Dog.fromFile(name);
+        if (dog != null) {
+            dog.haveBirthday();
+            dog.saveDog();
+        }
     }
 }
